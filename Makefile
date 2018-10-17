@@ -58,6 +58,7 @@ bench: $(TESTS)
 clean:
 	$(RM) $(TESTS) $(OBJS)
 	$(RM) $(deps)
-	rm -f  bench_cpy.txt bench_ref.txt ref.txt cpy.txt caculate
+	rm -f  bench_cpy.txt bench_ref.txt ref.txt cpy.txt runtime*.png caculate
+# rm -rf  runtime.png
 
 -include $(deps)
