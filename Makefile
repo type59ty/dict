@@ -1,5 +1,4 @@
 TESTS = test_cpy test_ref
-
 TEST_DATA = s Tai
 
 CFLAGS = -O0 -Wall -Werror -g
@@ -42,6 +41,7 @@ test_%: test_%.o $(OBJS_LIB)
 	$(Q)$(CC) -o $@ $(CFLAGS) -c -MMD -MF .$@.d $<
 
 test:  $(TESTS)
+	rm -f cpy.txt ref.txt
 	echo 3 | sudo tee /proc/sys/vm/drop_caches;
 	perf stat --repeat 100 \
                 -e cache-misses,cache-references,instructions,cycles \
@@ -50,15 +50,25 @@ test:  $(TESTS)
                 -e cache-misses,cache-references,instructions,cycles \
 				./test_ref --bench $(TEST_DATA)
 
-bench: $(TESTS)
-	@for test in $(TESTS); do\
-		./$$test --bench $(TEST_DATA); \
-	done
+plot:
+	gcc -o calculate calculate.c
+	./calculate
+	gnuplot scripts/runtime*.gp
+	eog runtime*.png 
+
+#bench: $(TESTS)
+#	@for test in $(TESTS); do\
+#		./$$test --bench ; \
+#	done
+
+bench:
+	./test_cpy --bench
+	./test_ref --bench
+
 
 clean:
 	$(RM) $(TESTS) $(OBJS)
 	$(RM) $(deps)
 	rm -f  bench_cpy.txt bench_ref.txt ref.txt cpy.txt runtime*.png caculate
-# rm -rf  runtime.png
 
 -include $(deps)
